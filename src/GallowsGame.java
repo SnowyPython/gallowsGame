@@ -19,16 +19,6 @@ public class GallowsGame {
         return dictionary;
     }
 
-    private static String createMask(String word) {
-        String result = "";
-        char[] chars = word.toCharArray();
-        for (int i = 0; i < chars.length; i++) {
-            result += "*";
-        }
-
-        return result;
-    }
-
     private static void printGallows(int mistakesCount) {
         switch (mistakesCount) {
             case 0:
@@ -87,34 +77,41 @@ public class GallowsGame {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String[] dictionary = createDictionary();
 
-        while (true) {
-            System.out.println("Вы хотите начать игру? (Д/Н)");
-            String input = reader.readLine();
+        System.out.println("Вы хотите начать игру? (Д/Н)");
+        String input = reader.readLine();
+        int mistakesCount = 0;
 
-            if (input.equals("Д")) {
-                int mistakesCount = 0;
-                String word = dictionary[(int) (Math.random() * dictionary.length)];
-                String mask = createMask(word);
+        if (input.equals("Д")) {
+            Mask.setWordAndMask(dictionary[(int) (Math.random() * dictionary.length)].toLowerCase());
 
-                System.out.println(mask);
+            while (true) {
+                System.out.println(Mask.getMask());
                 printGallows(mistakesCount);
-
-                System.out.println("введите букву");
-                String letter = reader.readLine();
-                if (letter.contains(word)) {
-
+                if (!Mask.getMask().contains("*")) {
+                    System.out.println("Победа ура ура!!!");
+                    break;
                 }
 
-            } else if (input.equals("Н")) {
-                break;
-            } else {
-                System.out.println("Неверный ввод, введите Д или Н");
+                if (mistakesCount == 6) {
+                    System.out.println("Вы проиграли!");
+                    break;
+                }
+
+                System.out.println("введите букву");
+                char letter = reader.readLine().charAt(0);
+
+                if (Mask.getWord().indexOf(letter) > -1) {
+                    Mask.editWordWithMask(letter, Mask.getWord(), Mask.getMask());
+                } else {
+                    mistakesCount++;
+                }
             }
+        } else if (input.equals("Н")) {
+            System.out.println("ладно");
+        } else {
+            System.out.println("Неверный ввод, введите Д или Н");
         }
     }
-
-    public static void main(String[] args) throws IOException {
-        startGame();
-    }
 }
+
 

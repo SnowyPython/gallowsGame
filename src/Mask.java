@@ -1,48 +1,33 @@
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-
 public class Mask {
-    private static String word;
-    private static String wordMask;
+    private String word;
+    private String wordMask;
 
-    public static String getMask() {
+    public Mask(String word) {
+        this.word = word;
+        this.wordMask = createMask(word);
+    }
+
+    public String getMask() {
         return wordMask;
     }
 
-    public static String getWord() {
+    public String getWord() {
         return word;
     }
 
-    public static void setWordAndMask(String word) throws IOException {
-        Mask.word = word;
-        wordMask = createMask(word);
+    public String createMask(String word) {
+        return "*".repeat(word.length());
     }
-    public static String createMask(String word) {
-        String result = "";
-        char[] chars = word.toCharArray();
 
-        for (int i = 0; i < chars.length; i++) {
-            result += '*';
-        }
+    public void editWordWithMask(char letter) {
+        StringBuilder updateMask = new StringBuilder();
 
-        return result;
-    }
-    public static void editWordWithMask(char l, String word, String mask) {
-        char[] original = word.toCharArray();
-        char[] clone = mask.toCharArray();
-
-        for (int i = 0; i < original.length; i++) {
-            if (l == original[i]) {
-                clone[i] = l;
+        for (int i = 0; i < word.length(); i++) {
+            if (letter == word.charAt(i)) {
+                updateMask.setCharAt(i, letter);
             }
         }
 
-        String result = "";
-        for (int i = 0; i < clone.length; i++) {
-            result += clone[i];
-        }
-
-        wordMask = result;
+        wordMask = updateMask.toString();
     }
 }

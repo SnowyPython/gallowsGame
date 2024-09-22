@@ -2,9 +2,12 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Random;
 
 public class GallowsGame {
-    private static String[] createDictionary() throws IOException {
+    private static final int MAX_MISTAKES_COUNT = 6;
+
+    private String[] createDictionary() throws IOException {
         String filePath = "src/words.txt";
         BufferedReader reader = new BufferedReader(new FileReader(filePath));
         String[] dictionary = new String[100];
@@ -19,61 +22,7 @@ public class GallowsGame {
         return dictionary;
     }
 
-    private static void printGallows(int mistakesCount) {
-        switch (mistakesCount) {
-            case 0:
-                System.out.println("------");
-                System.out.println("|/");
-                System.out.println("|");
-                System.out.println("|");
-                System.out.println("|");
-                break;
-            case 1:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|");
-                System.out.println("|");
-                break;
-            case 2:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|   |");
-                System.out.println("|");
-                break;
-            case 3:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|  /|");
-                System.out.println("|");
-                break;
-            case 4:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|  /|\\");
-                System.out.println("|");
-                break;
-            case 5:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|  /|\\");
-                System.out.println("|  /");
-                break;
-            case 6:
-                System.out.println("------");
-                System.out.println("|/  |");
-                System.out.println("|   0");
-                System.out.println("|  /|\\");
-                System.out.println("|  / \\");
-                break;
-        }
-    }
-
-    public static void startGame() throws IOException {
+    public void startGame() throws IOException {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
         String[] dictionary = createDictionary();
 
@@ -82,26 +31,23 @@ public class GallowsGame {
         int mistakesCount = 0;
 
         if (input.equals("Д")) {
-            Mask.setWordAndMask(dictionary[(int) (Math.random() * dictionary.length)].toLowerCase());
+            Random random = new Random();
+            String randomWord = dictionary[random.nextInt(dictionary.length)].toLowerCase();
+
+            Mask mask = new Mask(randomWord);
 
             while (true) {
-                System.out.println(Mask.getMask());
-                printGallows(mistakesCount);
-                if (!Mask.getMask().contains("*")) {
-                    System.out.println("Победа ура ура!!!");
-                    break;
-                }
+                System.out.println(mask.getMask());
+                Gallows.printGallows(mistakesCount);
 
-                if (mistakesCount == 6) {
-                    System.out.println("Вы проиграли!");
-                    break;
-                }
+                if (checkWin(mask)) break;
+                if (checkLose(mistakesCount)) break;
 
                 System.out.println("введите букву");
                 char letter = reader.readLine().charAt(0);
 
-                if (Mask.getWord().indexOf(letter) > -1) {
-                    Mask.editWordWithMask(letter, Mask.getWord(), Mask.getMask());
+                if (mask.getWord().indexOf(letter) > -1) {
+                    mask.editWordWithMask(letter);
                 } else {
                     mistakesCount++;
                 }
@@ -111,6 +57,22 @@ public class GallowsGame {
         } else {
             System.out.println("Неверный ввод, введите Д или Н");
         }
+    }
+
+    public boolean checkLose(int mistakesCount) {
+        if (mistakesCount == MAX_MISTAKES_COUNT) {
+            System.out.println("Вы проиграли!");
+            return true;
+        }
+        return false;
+    }
+
+    public boolean checkWin(Mask mask) {
+        if (!mask.getMask().contains("*")) {
+            System.out.println("Победа ура ура!!!");
+            return true;
+        }
+        return false;
     }
 }
 
